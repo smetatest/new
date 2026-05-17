@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Смета.AI — черновик сметы за 5 минут</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f4f3ee;
+  --border: #e6e4dc;
+  --border-strong: #d4d2c8;
+  --text: #1a1a1a;
+  --text-muted: #6b6a64;
+  --text-dim: #999893;
+  --accent: #6d4eff;
+  --accent-light: #efeafe;
+  --accent-dark: #4a32c4;
+  --success: #2e8b57;
+  --success-light: #e8f5e9;
+  --warning: #c97a00;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 28px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--text);
+  color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.brand-tag {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.topbar-right {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.topbar-right a {
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-left: 18px;
+  border-bottom: 1px dotted var(--text-dim);
+}
+
+.hero {
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.hero .lead {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 720px;
+}
+
+.hero .lead strong { color: var(--text); font-weight: 600; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  .result-card { position: relative !important; top: 0 !important; }
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.form-section {
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.form-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+input[type="number"], input[type="text"], select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.pill-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pill-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  color: var(--text);
+  transition: all 0.12s;
+}
+.pill-btn:hover { background: var(--surface-2); }
+.pill-btn.active {
+  background: var(--text);
+  color: var(--surface);
+  border-color: var(--text);
+}
+
+.field-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  position: sticky;
+  top: 20px;
+}
+
+.result-label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.result-total {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.result-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+.breakdown-row:last-of-type { border-bottom: none; }
+
+.breakdown-row .lbl { color: var(--text-muted); }
+.breakdown-row .val {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.breakdown-row.total {
+  border-top: 2px solid var(--text);
+  padding-top: 12px;
+  margin-top: 6px;
+  font-size: 14px;
+}
+.breakdown-row.total .lbl { color: var(--text); font-weight: 600; }
+
+.cta-primary, .cta-secondary {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  transition: all 0.15s;
+  margin-top: 12px;
+}
+
+.cta-primary {
+  background: var(--text);
+  color: var(--surface);
+}
+.cta-primary:hover { background: var(--accent-dark); }
+
+.cta-secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border-strong);
+}
+.cta-secondary:hover { background: var(--surface-2); }
+
+.price-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 14px;
+  padding: 10px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  border: 1px dashed var(--border-strong);
+}
+
+.price-tag .strike {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+
+.price-tag .accent {
+  background: var(--success-light);
+  color: var(--success);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--surface-2);
+  padding: 4px;
+  border-radius: var(--radius);
+  width: fit-content;
+}
+
+.tab {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 7px;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+.tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.demo-banner {
+  background: linear-gradient(0deg, var(--accent-light), var(--accent-light));
+  border: 1px solid #d4ccff;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--accent-dark);
+}
+
+.demo-banner-icon {
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.footer a { color: var(--text-muted); }
+
+#extended-fields { display: none; }
+#extended-fields.shown { display: block; }
+
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.shown { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 540px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.modal h2 { font-size: 22px; margin-bottom: 8px; }
+.modal p { color: var(--text-muted); margin-bottom: 16px; }
+.modal .modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.modal .modal-actions button {
+  flex: 1;
+  padding: 11px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+.modal .modal-actions button.primary {
+  background: var(--text);
+  color: var(--surface);
+  border-color: var(--text);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">С</div>
+      <span>Смета.AI</span>
+      <span class="brand-tag">DEMO</span>
+    </div>
+    <div class="topbar-right">
+      <a href="#" onclick="alert('Это демо-версия. Полная версия с PDF и личным кабинетом — на лендинге.')">Войти</a>
+      <a href="https://github.com/" target="_blank">GitHub</a>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>Смета на частный дом — за 5 минут</h1>
+    <p class="lead">
+      Черновик профессиональной сметы для подрядчиков ИЖС и сметчиков. Заполняешь форму — получаешь расчёт с разбивкой по работам и материалам в актуальных ценах региона. <strong>Доводишь до финала за 20 минут вместо 4 часов.</strong>
+    </p>
+  </div>
+
+  <div class="demo-banner">
+    <div class="demo-banner-icon">i</div>
+    <div>Это рабочее демо. Цифры реальные, считаются по упрощённой модели на базе ФЕР для 6 регионов. Полный продукт — 100+ позиций и интеграция с ценами стройбаз.</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('basic', this)">Быстрый расчёт</button>
+    <button class="tab" onclick="switchTab('extended', this)">Детальный расчёт</button>
+  </div>
+
+  <div class="layout">
+    <div class="form-card">
+
+      <div class="form-section">
+        <div class="section-title">Объект и регион</div>
+
+        <div class="field">
+          <label for="region">Регион строительства</label>
+          <select id="region" onchange="recalc()">
+            <option value="msk" data-coef="1.18">Москва и область</option>
+            <option value="spb" data-coef="1.07">Санкт-Петербург и область</option>
+            <option value="krd" data-coef="0.96">Краснодарский край</option>
+            <option value="ekb" data-coef="0.93">Свердловская область</option>
+            <option value="kzn" data-coef="0.91">Татарстан</option>
+            <option value="nsk" data-coef="0.94">Новосибирская область</option>
+          </select>
+          <div class="field-hint">Применяется региональный коэффициент к расценкам ФЕР</div>
+        </div>
+
+        <div class="field">
+          <label>Этажность</label>
+          <div class="pill-row" data-group="floors">
+            <button class="pill-btn active" data-val="1">1 этаж</button>
+            <button class="pill-btn" data-val="1.5">1 + мансарда</button>
+            <button class="pill-btn" data-val="2">2 этажа</button>
+          </div>
+        </div>
+
+        <div class="field-row-2">
+          <div class="field">
+            <label for="area">Общая площадь, м²</label>
+            <input type="number" id="area" value="120" min="40" max="500" step="10" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label for="ceiling">Высота этажа, м</label>
+            <input type="number" id="ceiling" value="3" min="2.4" max="4" step="0.1" oninput="recalc()">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Конструктив</div>
+
+        <div class="field">
+          <label>Тип фундамента</label>
+          <div class="pill-row" data-group="foundation">
+            <button class="pill-btn active" data-val="strip" data-rate="4500">Ленточный</button>
+            <button class="pill-btn" data-val="slab" data-rate="6800">Плитный</button>
+            <button class="pill-btn" data-val="pile" data-rate="3200">Свайный</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Материал стен</label>
+          <div class="pill-row" data-group="walls">
+            <button class="pill-btn active" data-val="aerated" data-rate="13500">Газобетон</button>
+            <button class="pill-btn" data-val="brick" data-rate="18500">Кирпич</button>
+            <button class="pill-btn" data-val="timber" data-rate="15800">Брус</button>
+            <button class="pill-btn" data-val="frame" data-rate="11000">Каркас</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Толщина стен</label>
+          <div class="pill-row" data-group="thickness">
+            <button class="pill-btn" data-val="200">200 мм</button>
+            <button class="pill-btn active" data-val="300">300 мм</button>
+            <button class="pill-btn" data-val="400">400 мм</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Тип кровли</label>
+          <div class="pill-row" data-group="roof">
+            <button class="pill-btn active" data-val="metal" data-rate="2200">Металлочерепица</button>
+            <button class="pill-btn" data-val="soft" data-rate="1900">Мягкая</button>
+            <button class="pill-btn" data-val="profile" data-rate="1500">Профнастил</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" id="extended-fields">
+        <div class="section-title">Дополнительно · детальный расчёт</div>
+
+        <div class="field-row-2">
+          <div class="field">
+            <label for="windows">Площадь окон, м²</label>
+            <input type="number" id="windows" value="20" min="0" step="1" oninput="recalc()">
+          </div>
+          <div class="field">
+            <label for="doors">Количество дверей</label>
+            <input type="number" id="doors" value="6" min="0" step="1" oninput="recalc()">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Внешняя отделка фасада</label>
+          <div class="pill-row" data-group="facade">
+            <button class="pill-btn active" data-val="plaster" data-rate="850">Штукатурка</button>
+            <button class="pill-btn" data-val="siding" data-rate="1200">Сайдинг</button>
+            <button class="pill-btn" data-val="brick" data-rate="2400">Облицовочный кирпич</button>
+            <button class="pill-btn" data-val="wood" data-rate="1800">Дерево</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Отопление</label>
+          <div class="pill-row" data-group="heating">
+            <button class="pill-btn active" data-val="gas" data-rate="3500">Газ</button>
+            <button class="pill-btn" data-val="electric" data-rate="1800">Электричество</button>
+            <button class="pill-btn" data-val="pump" data-rate="6500">Тепловой насос</button>
+            <button class="pill-btn" data-val="none" data-rate="0">Нет</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Уровень внутренней отделки</label>
+          <div class="pill-row" data-group="finish">
+            <button class="pill-btn active" data-val="none" data-rate="0">Без отделки</button>
+            <button class="pill-btn" data-val="rough" data-rate="8000">Черновая</button>
+            <button class="pill-btn" data-val="full" data-rate="22000">Под ключ</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="result-card">
+      <div class="result-label">Стоимость объекта</div>
+      <div class="result-total" id="total">3 870 000 ₽</div>
+      <div class="result-meta" id="range">диапазон 3,5–4,3 млн ₽ · точность ±10%</div>
+
+      <div class="breakdown">
+        <div class="breakdown-row">
+          <span class="lbl">Земляные работы</span>
+          <span class="val" id="r-earth">86 400 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Фундамент</span>
+          <span class="val" id="r-foundation">540 000 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Коробка дома</span>
+          <span class="val" id="r-walls">1 215 000 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Перекрытия</span>
+          <span class="val" id="r-floors">324 000 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Кровля</span>
+          <span class="val" id="r-roof">312 000 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Окна и двери</span>
+          <span class="val" id="r-openings">240 000 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Отделка и инженерка</span>
+          <span class="val" id="r-finish">462 000 ₽</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="lbl">Накладные (15%) и прибыль (8%)</span>
+          <span class="val" id="r-overhead">683 000 ₽</span>
+        </div>
+        <div class="breakdown-row total">
+          <span class="lbl">Итого</span>
+          <span class="val" id="r-total">3 870 000 ₽</span>
+        </div>
+      </div>
+
+      <button class="cta-primary" onclick="downloadPdf()">Скачать смету · PDF</button>
+      <button class="cta-secondary" onclick="showCommercial()">Сделать КП для клиента</button>
+
+      <div class="price-tag">
+        <span class="strike">Сметчик: 5 000–15 000 ₽</span>
+        <span>→ <strong>1 490 ₽</strong></span>
+        <span class="accent">×7 дешевле</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Демо-версия. Опенсорс прототип для customer development.
+    <a href="https://github.com/your-repo/smeta-ai" target="_blank">github.com/your-repo/smeta-ai</a>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h2 id="modal-title">Скачать PDF сметы</h2>
+    <p id="modal-text">В реальном продукте здесь оплата 1 490 ₽ и скачивание PDF. В демо — можно сразу скачать пример документа, чтобы посмотреть формат.</p>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Закрыть</button>
+      <button class="primary" onclick="closeModal(); window.open('./sample-smeta.pdf', '_blank')">Скачать образец</button>
+    </div>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
